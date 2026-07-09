@@ -10,13 +10,19 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import PublicProfilePage from './pages/profile/PublicProfilePage';
 import SettingsPage from './pages/settings/SettingsPage';
+import CheckInPage from './pages/growth/CheckInPage';
+import TimelinePage from './pages/growth/TimelinePage';
+import ChallengesPage from './pages/challenges/ChallengesPage';
+import ChallengeDetailPage from './pages/challenges/ChallengeDetailPage';
+import MyChallengesPage from './pages/challenges/MyChallengesPage';
+import LeaderboardPage from './pages/leaderboard/LeaderboardPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -30,7 +36,7 @@ const PublicRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -44,7 +50,7 @@ const LandingRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -96,6 +102,12 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/:username" element={<PublicProfilePage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/check-in" element={<CheckInPage />} />
+        <Route path="/timeline" element={<TimelinePage />} />
+        <Route path="/challenges" element={<ChallengesPage />} />
+        <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
+        <Route path="/my-challenges" element={<MyChallengesPage />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
       </Route>
 
       {/* Catch all */}

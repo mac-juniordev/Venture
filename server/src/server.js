@@ -8,8 +8,13 @@ import { connectDB } from './config/db.js';
 import { env } from './config/env.js';
 import { corsOptions } from './config/cors.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { seedMotivationMessages } from './utils/seedMotivation.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import growthRoutes from './routes/growthRoutes.js';
+import challengeRoutes from './routes/challengeRoutes.js';
+import motivationRoutes from './routes/motivationRoutes.js';
+import leaderboardRoutes from './routes/leaderboardRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +22,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(() => {
+  seedMotivationMessages();
+});
 
 // Middleware
 app.use(helmet());
@@ -32,7 +39,10 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/growth', growthRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/motivation', motivationRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
