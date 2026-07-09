@@ -25,7 +25,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('venture-token');
-      if (window.location.pathname !== '/login') {
+      // Only redirect if not already on a public page
+      const publicPaths = ['/login', '/register', '/'];
+      const currentPath = window.location.pathname;
+      if (!publicPaths.includes(currentPath)) {
         window.location.href = '/login';
       }
     }

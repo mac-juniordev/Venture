@@ -16,24 +16,35 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider value={{}}>
       {children}
       <Toaster
-        position="top-right"
+        position="bottom-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: 'var(--bg-card)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border-color)',
+            background: '#fff',
+            color: '#1f2937',
+            padding: '16px',
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '500',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05)',
+            border: '1px solid #e5e7eb',
           },
           success: {
             iconTheme: {
-              primary: 'var(--success-color)',
-              secondary: 'var(--bg-card)',
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+            style: {
+              borderLeft: '4px solid #10b981',
             },
           },
           error: {
             iconTheme: {
-              primary: 'var(--error-color)',
-              secondary: 'var(--bg-card)',
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+            style: {
+              borderLeft: '4px solid #ef4444',
             },
           },
         }}

@@ -2,16 +2,21 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Spinner from './components/ui/Spinner';
-import PublicLayout from './components/layout/PublicLayout';
+import AppLayout from './components/layout/AppLayout';
+import LandingPage from './pages/landing/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
+import ProfilePage from './pages/profile/ProfilePage';
+import PublicProfilePage from './pages/profile/PublicProfilePage';
+import SettingsPage from './pages/settings/SettingsPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -25,7 +30,7 @@ const PublicRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -34,45 +39,67 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
+const LandingRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
+};
+
 const AppRouter = () => {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Landing Page */}
       <Route
+        path="/"
+        element={
+          <LandingRoute>
+            <LandingPage />
+          </LandingRoute>
+        }
+      />
+      
+      {/* Auth Routes */}
+      <Route
+        path="/login"
         element={
           <PublicRoute>
-            <PublicLayout />
+            <LoginPage />
           </PublicRoute>
         }
-      >
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
-
-      {/* Protected Routes - Will be built in future systems */}
+      />
       <Route
-        path="/dashboard"
+        path="/register"
         element={
-          <ProtectedRoute>
-            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-4">
-                  Dashboard Coming Soon
-                </h1>
-                <p className="text-[var(--text-muted)]">
-                  Your growth journey awaits. System 2 coming next.
-                </p>
-              </div>
-            </div>
-          </ProtectedRoute>
+          <PublicRoute>
+            <RegisterPage />
+          </PublicRoute>
         }
       />
 
-      {/* Redirect root to dashboard or login */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
+      {/* Protected Routes with AppLayout */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:username" element={<PublicProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Route>
+
       {/* Catch all */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

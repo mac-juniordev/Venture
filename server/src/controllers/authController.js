@@ -7,15 +7,14 @@ export const register = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      throw new AppError('Please provide email and password', 400);
+      return next(new AppError('Please provide email and password', 400));
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      throw new AppError('Email already registered', 400);
+      return next(new AppError('Email already registered', 400));
     }
 
-    // Force role to 'user' - never allow admin registration through public API
     const user = await User.create({
       email,
       password,

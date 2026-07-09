@@ -17,27 +17,28 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('venture-token');
-    if (token) {
-      loadUser();
-    } else {
+    const initAuth = async () => {
+      const token = localStorage.getItem('venture-token');
+      if (token) {
+        try {
+          const response = await authService.getMe();
+          setUser(response.data.data.user);
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          localStorage.removeItem('venture-token');
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
       setLoading(false);
-    }
-  }, []);
+    };
 
-  const loadUser = async () => {
-    try {
-      const response = await authService.getMe();
-      setUser(response.data.data.user);
-      setIsAuthenticated(true);
-    } catch (error) {
-      localStorage.removeItem('venture-token');
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+    initAuth();
+  }, []);
 
   const login = async (email, password) => {
     const response = await authService.login(email, password);
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
     } catch (error) {
-      // Continue with local logout even if API call fails
+      console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('venture-token');
       setUser(null);

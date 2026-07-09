@@ -7,15 +7,15 @@ import AppRouter from './router';
 
 const App = () => {
   return (
-    <Router>
-      <ThemeProvider>
+    <ThemeProvider>
+      <NotificationProvider>
         <AuthProvider>
-          <NotificationProvider>
+          <Router>
             <AppRouter />
-          </NotificationProvider>
+          </Router>
         </AuthProvider>
-      </ThemeProvider>
-    </Router>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 };
 
