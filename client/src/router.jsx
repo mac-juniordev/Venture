@@ -16,6 +16,9 @@ import ChallengesPage from './pages/challenges/ChallengesPage';
 import ChallengeDetailPage from './pages/challenges/ChallengeDetailPage';
 import MyChallengesPage from './pages/challenges/MyChallengesPage';
 import LeaderboardPage from './pages/leaderboard/LeaderboardPage';
+import AchievementsPage from './pages/achievements/AchievementsPage';
+import CommunityPage from './pages/community/CommunityPage';
+import UpgradePage from './pages/upgrade/UpgradePage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -108,6 +111,9 @@ const AppRouter = () => {
         <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
         <Route path="/my-challenges" element={<MyChallengesPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/achievements" element={<AchievementsPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/upgrade" element={<UpgradePage />} />
       </Route>
 
       {/* Catch all */}

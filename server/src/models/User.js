@@ -22,27 +22,40 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
     },
-
     password: {
       type: String,
       required: [true, 'Password is required'],
       minlength: [8, 'Password must be at least 8 characters'],
       select: false,
     },
-
     role: {
       type: String,
       enum: ['user', 'admin'],
       default: 'user',
     },
-
     securityQuestions: [securityQuestionSchema],
-
     isActive: {
       type: Boolean,
       default: true,
     },
-
+    accountStatus: {
+      type: String,
+      enum: ['active', 'suspended', 'deactivated', 'archived'],
+      default: 'active',
+    },
+    suspensionEndDate: {
+      type: Date,
+      default: null,
+    },
+    suspensionReason: {
+      type: String,
+      enum: ['user_requested', 'admin_action', 'inactivity', null],
+      default: null,
+    },
+    deactivatedAt: {
+      type: Date,
+      default: null,
+    },
     lastLogin: {
       type: Date,
     },
@@ -52,25 +65,20 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-
-// Hash password before saving
+// Hash password only when it has changed
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
-    return;
-  }
+  if (!this.isModified('password')) return;
 
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-
-// Compare password during login
+// Compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-
-// Remove sensitive fields from API responses
+// Hide sensitive fields
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
 
@@ -80,7 +88,6 @@ userSchema.methods.toJSON = function () {
 
   return obj;
 };
-
 
 const User = mongoose.model('User', userSchema);
 

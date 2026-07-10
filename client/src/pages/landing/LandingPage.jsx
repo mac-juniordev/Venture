@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -9,26 +9,20 @@ import {
   Target, 
   BarChart3, 
   ArrowRight, 
-  Menu, 
-  X,
   Sparkles,
   Shield,
   Clock,
-  Heart
+  Heart,
+  Check,
+  Sprout,
+  Rocket,
+  Crown
 } from 'lucide-react';
+import PublicNavbar from '../../components/layout/PublicNavbar';
 import heroImage from '../../assets/hero-developers.jpg';
 
 const LandingPage = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   const features = [
     {
@@ -70,61 +64,80 @@ const LandingPage = () => {
     { number: "500+", label: "Challenges Completed" }
   ];
 
+  const plans = [
+    {
+      name: "Explorer",
+      icon: <Sprout className="w-7 h-7" />,
+      iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      description: "Start your growth journey with essential tracking tools.",
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      cta: "Start Free",
+      features: [
+        { text: "Daily check-ins & streaks", included: true },
+        { text: "Basic growth tracking", included: true },
+        { text: "Join up to 3 challenges", included: true },
+        { text: "Community reactions", included: true },
+        { text: "Achievement badges", included: true },
+        { text: "Leaderboard access", included: true },
+        { text: "Custom challenge creation", included: false },
+        { text: "Advanced analytics", included: false },
+        { text: "Priority support", included: false },
+        { text: "Custom branding", included: false },
+      ]
+    },
+    {
+      name: "Builder",
+      icon: <Rocket className="w-7 h-7" />,
+      iconBg: "bg-sky-100 dark:bg-sky-900/30",
+      iconColor: "text-sky-600 dark:text-sky-400",
+      description: "Unlock advanced features to accelerate your growth.",
+      monthlyPrice: 9,
+      yearlyPrice: 7,
+      cta: "Start Building",
+      popular: true,
+      features: [
+        { text: "Everything in Explorer", included: true },
+        { text: "Unlimited challenges", included: true },
+        { text: "Create custom challenges", included: true },
+        { text: "Advanced analytics & insights", included: true },
+        { text: "Export growth reports", included: true },
+        { text: "Priority challenge access", included: true },
+        { text: "Ad-free experience", included: true },
+        { text: "Custom branding", included: false },
+        { text: "Team challenges", included: false },
+      ]
+    },
+    {
+      name: "Visionary",
+      icon: <Crown className="w-7 h-7" />,
+      iconBg: "bg-purple-100 dark:bg-purple-900/30",
+      iconColor: "text-purple-600 dark:text-purple-400",
+      description: "For serious builders who want the complete ecosystem.",
+      monthlyPrice: 19,
+      yearlyPrice: 15,
+      cta: "Go Visionary",
+      features: [
+        { text: "Everything in Builder", included: true },
+        { text: "Custom branding & profile", included: true },
+        { text: "Team challenges & groups", included: true },
+        { text: "API access", included: true },
+        { text: "Priority support 24/7", included: true },
+        { text: "Early access to features", included: true },
+        { text: "Exclusive Visionary badge", included: true },
+        { text: "Monthly coaching calls", included: true },
+        { text: "White-label options", included: true },
+      ]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg shadow-sky-100/50 dark:shadow-gray-900/50' 
-          : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent">
-                VENTURE
-              </span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 dark:hover:text-sky-400 font-medium transition-colors">
-                Features
-              </a>
-              <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 dark:hover:text-sky-400 font-medium transition-colors">
-                About
-              </a>
-              <a href="#contact" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 dark:hover:text-sky-400 font-medium transition-colors">
-                Contact
-              </a>
-              <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 dark:hover:text-sky-400 font-medium transition-colors">
-                Sign In
-              </Link>
-              <Link to="/register" className="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-emerald-400 hover:from-sky-500 hover:to-emerald-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-sky-200 dark:shadow-sky-900/30">
-                Start Building
-              </Link>
-            </div>
-
-            <button className="md:hidden text-gray-600 dark:text-gray-300" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {mobileMenuOpen && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="md:hidden py-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
-              <div className="flex flex-col gap-4">
-                <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Features</a>
-                <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 font-medium py-2" onClick={() => setMobileMenuOpen(false)}>About</a>
-                <a href="#contact" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Contact</a>
-                <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-sky-500 font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                <Link to="/register" className="px-6 py-3 bg-gradient-to-r from-sky-400 to-emerald-400 text-white font-semibold rounded-xl text-center shadow-lg shadow-sky-200" onClick={() => setMobileMenuOpen(false)}>Start Building</Link>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </nav>
+      <PublicNavbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
         <div className="absolute inset-0 z-0">
           <img src={heroImage} alt="Developers collaborating" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-sky-900/90 to-emerald-900/95" />
@@ -136,7 +149,7 @@ const LandingPage = () => {
               <div className="px-4 py-2 bg-sky-400/20 backdrop-blur-sm rounded-full border border-sky-400/30">
                 <span className="text-sky-300 font-medium text-sm flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  Powered by Consistency
+                  Powered by MacDotCom
                 </span>
               </div>
             </div>
@@ -155,8 +168,8 @@ const LandingPage = () => {
                 Start Your Journey
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="#features" className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-semibold text-lg rounded-xl transition-all duration-200 text-center">
-                Explore Features
+              <a href="#pricing" className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-semibold text-lg rounded-xl transition-all duration-200 text-center">
+                View Plans
               </a>
             </div>
 
@@ -207,8 +220,115 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 px-6 bg-gradient-to-br from-sky-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Choose Your
+              <span className="block bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent">Growth Path</span>
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+              Every journey starts with a single step. Pick the plan that matches your ambition.
+            </p>
+          </motion.div>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <span className={`text-sm font-medium ${billingCycle === 'monthly' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>Monthly</span>
+            <button
+              onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
+              className="relative w-14 h-7 bg-sky-400 dark:bg-sky-500 rounded-full transition-colors"
+            >
+              <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-0.5'}`} />
+            </button>
+            <span className={`text-sm font-medium ${billingCycle === 'yearly' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>
+              Yearly
+              <span className="ml-1.5 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs rounded-full font-bold">Save 20%</span>
+            </span>
+          </div>
+
+          {/* Pricing Cards */}
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`relative bg-white dark:bg-gray-800 rounded-2xl border-2 p-6 md:p-8 flex flex-col ${
+                  plan.popular
+                    ? 'border-sky-400 dark:border-sky-500 shadow-xl shadow-sky-100 dark:shadow-sky-900/30'
+                    : 'border-gray-100 dark:border-gray-700 shadow-sm'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-sky-400 to-emerald-400 text-white text-xs font-bold rounded-full shadow-lg">
+                    MOST POPULAR
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <div className={`w-12 h-12 ${plan.iconBg} rounded-xl flex items-center justify-center ${plan.iconColor} mb-4`}>
+                    {plan.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{plan.name}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{plan.description}</p>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                      ${billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
+                    </span>
+                    <span className="text-gray-400 dark:text-gray-500 text-sm">/month</span>
+                  </div>
+                  {billingCycle === 'yearly' && plan.yearlyPrice > 0 && (
+                    <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
+                      Save ${plan.monthlyPrice * 12 - plan.yearlyPrice * 12} yearly
+                    </p>
+                  )}
+                  {plan.monthlyPrice === 0 && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">No credit card required</p>
+                  )}
+                </div>
+
+                <Link
+                  to="/register"
+                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 mb-6 text-center ${
+                    plan.popular
+                      ? 'bg-gradient-to-r from-sky-400 to-emerald-400 hover:from-sky-500 hover:to-emerald-500 text-white shadow-lg shadow-sky-200 dark:shadow-sky-900/30'
+                      : plan.monthlyPrice === 0
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+
+                <div className="space-y-3 flex-1">
+                  {plan.features.map((feature, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      {feature.included ? (
+                        <Check className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <span className="w-5 h-5 flex items-center justify-center text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5 text-sm">—</span>
+                      )}
+                      <span className={`text-sm ${feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                        {feature.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
-      <section id="about" className="py-24 px-6 bg-gradient-to-br from-sky-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 transition-colors duration-300">
+      <section id="about" className="py-24 px-6 dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -218,24 +338,36 @@ const LandingPage = () => {
               </h2>
               <div className="space-y-6">
                 <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-                  VENTURE was built on a simple truth: small, consistent actions compound into extraordinary results.
+                  VENTURE was built on a simple truth: small, consistent actions compound into extraordinary results. We're not another task manager — we're your growth partner.
                 </p>
                 <div className="space-y-4">
-                  {[
-                    { icon: Shield, color: 'sky', title: 'Consistency First', desc: 'Build habits that stick. Every check-in matters.' },
-                    { icon: Clock, color: 'emerald', title: 'Time is Moving', desc: 'Every moment is an opportunity to build something great.' },
-                    { icon: Heart, color: 'sky', title: 'Community Driven', desc: 'Grow together. Celebrate wins. Stay accountable.' }
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <div className={`w-10 h-10 bg-${item.color === 'sky' ? 'sky' : 'emerald'}-100 dark:bg-${item.color === 'sky' ? 'sky' : 'emerald'}-900/20 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <item.icon className={`w-5 h-5 text-${item.color === 'sky' ? 'sky' : 'emerald'}-500`} />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white mb-1">{item.title}</h3>
-                        <p className="text-gray-500 dark:text-gray-400">{item.desc}</p>
-                      </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-5 h-5 text-sky-500 dark:text-sky-400" />
                     </div>
-                  ))}
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-1">Consistency First</h3>
+                      <p className="text-gray-500 dark:text-gray-400">Build habits that stick. Every check-in matters.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-1">Time is Moving</h3>
+                      <p className="text-gray-500 dark:text-gray-400">Every moment is an opportunity to build something great.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-5 h-5 text-sky-500 dark:text-sky-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-1">Community Driven</h3>
+                      <p className="text-gray-500 dark:text-gray-400">Grow together. Celebrate wins. Stay accountable.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -282,6 +414,7 @@ const LandingPage = () => {
                   <h3 className="text-white font-bold mb-4">Platform</h3>
                   <div className="space-y-3">
                     <a href="#features" className="block text-gray-400 hover:text-sky-400 transition-colors">Features</a>
+                    <a href="#pricing" className="block text-gray-400 hover:text-sky-400 transition-colors">Pricing</a>
                     <a href="#about" className="block text-gray-400 hover:text-sky-400 transition-colors">About</a>
                     <Link to="/register" className="block text-gray-400 hover:text-sky-400 transition-colors">Get Started</Link>
                   </div>

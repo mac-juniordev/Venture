@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import PublicNavbar from '../../components/layout/PublicNavbar';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
@@ -62,8 +63,10 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+      <PublicNavbar />
+      
       {/* Mobile */}
-      <div className="lg:hidden">
+      <div className="lg:hidden pt-16">
         <div className="bg-gradient-to-br from-sky-400 via-sky-500 to-emerald-400 px-6 py-12 relative overflow-hidden">
           <div className="absolute inset-0 bg-white/10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
           <div className="relative z-10">
@@ -133,7 +136,7 @@ const RegisterPage = () => {
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:flex min-h-screen">
+      <div className="hidden lg:flex min-h-screen pt-16">
         <div className="w-1/2 bg-gradient-to-br from-sky-400 via-sky-500 to-emerald-400 flex items-center justify-center p-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-white/10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
           <div className="relative z-10 max-w-lg">

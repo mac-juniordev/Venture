@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { growthService } from '../../services/growthService';
+import { achievementService } from '../../services/achievementService';
 import { 
   CheckCircle, 
   Flame, 
@@ -61,7 +62,23 @@ const CheckInPage = () => {
         colors: ['#7dd3fc', '#34d399', '#fbbf24', '#f472b6'],
       });
       
-      toast.success('Check-in recorded! 🔥');
+      // Check for new achievements
+      if (data.newlyUnlocked && data.newlyUnlocked.length > 0) {
+        // Bigger confetti for achievements
+        setTimeout(() => {
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ['#fbbf24', '#a78bfa', '#34d399', '#7dd3fc', '#f472b6'],
+          });
+        }, 500);
+        
+        const achievementNames = data.newlyUnlocked.map(a => a.title).join(', ');
+        toast.success(`🎉 Achievements unlocked: ${achievementNames}!`, { duration: 5000 });
+      } else {
+        toast.success('Check-in recorded! 🔥');
+      }
     } catch (error) {
       const message = error.response?.data?.message || 'Check-in failed';
       toast.error(message);
@@ -133,8 +150,15 @@ const CheckInPage = () => {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">You're done for today!</h3>
             <p className="text-gray-500 dark:text-gray-400">Come back tomorrow to keep your streak alive.</p>
             {todayEntry?.note && (
-              <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+              <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl max-w-md mx-auto">
                 <p className="text-sm text-gray-600 dark:text-gray-300 italic">"{todayEntry.note}"</p>
+              </div>
+            )}
+            {todayEntry?.mood && (
+              <div className="mt-3">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Mood: {todayEntry.mood}
+                </span>
               </div>
             )}
           </div>

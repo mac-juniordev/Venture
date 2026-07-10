@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, User, CheckSquare, Trophy, BarChart3, Award, Users, LogOut,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, Crown,
 } from 'lucide-react';
 import LogoutModal from '../ui/LogoutModal';
 
@@ -18,6 +18,7 @@ const Sidebar = () => {
     { path: '/leaderboard', icon: BarChart3, label: 'Leaderboard' },
     { path: '/achievements', icon: Award, label: 'Achievements' },
     { path: '/community', icon: Users, label: 'Community' },
+    { path: '/upgrade', icon: Crown, label: 'Upgrade Plan' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
 

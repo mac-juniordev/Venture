@@ -9,12 +9,20 @@ import { env } from './config/env.js';
 import { corsOptions } from './config/cors.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { seedMotivationMessages } from './utils/seedMotivation.js';
+import { seedAchievements } from './utils/seedAchievements.js';
+import { seedPlans } from './utils/seedPlans.js';
+import { processSuspensions } from './services/accountService.js';
+import User from './models/User.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import growthRoutes from './routes/growthRoutes.js';
 import challengeRoutes from './routes/challengeRoutes.js';
 import motivationRoutes from './routes/motivationRoutes.js';
 import leaderboardRoutes from './routes/leaderboardRoutes.js';
+import achievementRoutes from './routes/achievementRoutes.js';
+import communityRoutes from './routes/communityRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,9 +30,41 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Connect to MongoDB
-connectDB().then(() => {
+connectDB().then(async () => {
+  // Migrate existing users - set default accountStatus for legacy users
+  const migrationResult = await User.updateMany(
+    { accountStatus: { $exists: false } },
+    { $set: { accountStatus: 'active' } }
+  );
+  if (migrationResult.modifiedCount > 0) {
+    console.log(`Migrated ${migrationResult.modifiedCount} users with default accountStatus`);
+  }
+
+  // Migrate existing users - set default role
+  await User.updateMany(
+    { role: { $exists: false } },
+    { $set: { role: 'user' } }
+  );
+
   seedMotivationMessages();
+  seedAchievements();
+  seedPlans();
+  console.log('Database connected and seeded');
 });
+
+// Check for expired suspensions every hour
+setInterval(() => {
+  processSuspensions().then(count => {
+    if (count > 0) console.log(`Processed ${count} expired suspensions`);
+  });
+}, 60 * 60 * 1000);
+
+// Run initial suspension check on startup
+setTimeout(() => {
+  processSuspensions().then(count => {
+    if (count > 0) console.log(`Startup: Processed ${count} expired suspensions`);
+  });
+}, 5000);
 
 // Middleware
 app.use(helmet());
@@ -43,6 +83,10 @@ app.use('/api/growth', growthRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/motivation', motivationRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -50,6 +94,10 @@ app.get('/api/health', (req, res) => {
     success: true,
     message: 'VENTURE API is running',
     timestamp: new Date().toISOString(),
+    routes: [
+      'auth', 'users', 'growth', 'challenges', 'motivation',
+      'leaderboard', 'achievements', 'community', 'subscription'
+    ],
   });
 });
 
@@ -58,6 +106,7 @@ app.use(errorHandler);
 
 app.listen(env.PORT, () => {
   console.log(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
+  console.log(`API: http://localhost:${env.PORT}/api`);
 });
 
 export default app;

@@ -2,6 +2,7 @@ import DailyEntry from '../models/DailyEntry.js';
 import Profile from '../models/Profile.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { calculateStreak } from '../services/streakService.js';
+import { checkAchievements } from '../services/achievementService.js';
 
 // Daily check-in
 export const checkIn = async (req, res, next) => {
@@ -23,7 +24,8 @@ export const checkIn = async (req, res, next) => {
     const entry = await DailyEntry.create({
       user: req.user._id,
       date: today,
-      note,
+      checkInTime: new Date(),
+      note: note || '',
       mood: mood || '',
       tags: tags || [],
     });
@@ -38,12 +40,18 @@ export const checkIn = async (req, res, next) => {
     // Calculate streaks
     const streaks = await calculateStreak(req.user._id);
 
+    // Check for new achievements
+    const newlyUnlocked = await checkAchievements(req.user._id);
+
     res.status(201).json({
       success: true,
-      message: 'Check-in recorded! Keep the streak alive.',
+      message: newlyUnlocked.length > 0 
+        ? `🎉 Check-in recorded! You unlocked ${newlyUnlocked.length} achievement(s)!` 
+        : 'Check-in recorded! Keep the streak alive.',
       data: {
         entry,
         streaks,
+        newlyUnlocked,
       },
     });
   } catch (error) {
@@ -59,7 +67,7 @@ export const getTodayStatus = async (req, res, next) => {
     const entry = await DailyEntry.findOne({
       user: req.user._id,
       date: today,
-    });
+    }).lean();
 
     const streaks = await calculateStreak(req.user._id);
 
@@ -76,14 +84,15 @@ export const getTodayStatus = async (req, res, next) => {
   }
 };
 
-// Get growth history
+// Get growth history with calendar
 export const getGrowthHistory = async (req, res, next) => {
   try {
     const { page = 1, limit = 30 } = req.query;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
+    // Get paginated entries
     const entries = await DailyEntry.find({ user: req.user._id })
-      .sort({ date: -1 })
+      .sort({ date: -1, checkInTime: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
@@ -117,9 +126,35 @@ export const getGrowthHistory = async (req, res, next) => {
           page: parseInt(page),
           limit: parseInt(limit),
           total,
-          pages: Math.ceil(total / limit),
+          pages: Math.ceil(total / parseInt(limit)),
         },
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get check-in by specific date
+export const getCheckInByDate = async (req, res, next) => {
+  try {
+    const { date } = req.params;
+    
+    const entry = await DailyEntry.findOne({
+      user: req.user._id,
+      date,
+    }).lean();
+
+    if (!entry) {
+      return res.status(200).json({
+        success: true,
+        data: { entry: null },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { entry },
     });
   } catch (error) {
     next(error);
