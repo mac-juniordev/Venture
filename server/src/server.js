@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { connectDB } from './config/db.js';
 import { env } from './config/env.js';
 import { corsOptions } from './config/cors.js';
@@ -23,28 +25,55 @@ import achievementRoutes from './routes/achievementRoutes.js';
 import communityRoutes from './routes/communityRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const httpServer = createServer(app);
+
+// Socket.IO setup
+const io = new Server(httpServer, {
+  cors: {
+    origin: env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+  },
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('Architect connected to System Pulse');
+
+  socket.on('join-admin', () => {
+    socket.join('admin-room');
+    console.log('Architect joined admin room');
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Architect disconnected');
+  });
+});
 
 // Connect to MongoDB
 connectDB().then(async () => {
-  // Migrate existing users - set default accountStatus for legacy users
-  const migrationResult = await User.updateMany(
+  // Migrate existing users
+  await User.updateMany(
     { accountStatus: { $exists: false } },
     { $set: { accountStatus: 'active' } }
   );
-  if (migrationResult.modifiedCount > 0) {
-    console.log(`Migrated ${migrationResult.modifiedCount} users with default accountStatus`);
-  }
-
-  // Migrate existing users - set default role
   await User.updateMany(
     { role: { $exists: false } },
     { $set: { role: 'user' } }
   );
+
+  // Seed architect account
+  try {
+    await User.seedArchitect();
+  } catch (err) {
+    console.error('Failed to seed architect:', err.message);
+  }
 
   seedMotivationMessages();
   seedAchievements();
@@ -59,7 +88,6 @@ setInterval(() => {
   });
 }, 60 * 60 * 1000);
 
-// Run initial suspension check on startup
 setTimeout(() => {
   processSuspensions().then(count => {
     if (count > 0) console.log(`Startup: Processed ${count} expired suspensions`);
@@ -76,6 +104,12 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Make io available in requests
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -87,6 +121,7 @@ app.use('/api/achievements', achievementRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -96,15 +131,16 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     routes: [
       'auth', 'users', 'growth', 'challenges', 'motivation',
-      'leaderboard', 'achievements', 'community', 'subscription'
+      'leaderboard', 'achievements', 'community', 'subscription',
+      'payments', 'admin'
     ],
   });
 });
 
-// Error handling - MUST be last
+// Error handling
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
+httpServer.listen(env.PORT, () => {
   console.log(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
   console.log(`API: http://localhost:${env.PORT}/api`);
 });

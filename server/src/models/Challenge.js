@@ -25,18 +25,13 @@ const challengeSchema = new mongoose.Schema(
     },
     reward: {
       type: String,
-      required: [true, 'Reward/Glory is required'],
+      default: 'Glory & XP',
       maxlength: [500, 'Reward cannot exceed 500 characters'],
     },
     penalty: {
       type: String,
       default: 'Lose 1 streak day',
       maxlength: [500, 'Penalty cannot exceed 500 characters'],
-    },
-    bonus: {
-      type: String,
-      default: '',
-      maxlength: [500, 'Bonus cannot exceed 500 characters'],
     },
     startDate: {
       type: Date,
@@ -53,9 +48,9 @@ const challengeSchema = new mongoose.Schema(
     },
     maxParticipants: {
       type: Number,
-      default: 50,
+      default: 20,
       min: 2,
-      max: 500,
+      max: 100,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -66,6 +61,11 @@ const challengeSchema = new mongoose.Schema(
       type: String,
       enum: ['upcoming', 'active', 'completed', 'cancelled'],
       default: 'upcoming',
+    },
+    winner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     participants: [{
       user: {
@@ -96,6 +96,8 @@ const challengeSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
@@ -103,8 +105,17 @@ challengeSchema.virtual('participantCount').get(function () {
   return this.participants.length;
 });
 
-challengeSchema.set('toJSON', { virtuals: true });
-challengeSchema.set('toObject', { virtuals: true });
+// Auto-set endDate to max 7 days from startDate
+challengeSchema.pre('save', function (next) {
+  if (this.isModified('startDate')) {
+    const maxEnd = new Date(this.startDate);
+    maxEnd.setDate(maxEnd.getDate() + 7);
+    if (!this.endDate || this.endDate > maxEnd) {
+      this.endDate = maxEnd;
+    }
+  }
+  next();
+});
 
 const Challenge = mongoose.model('Challenge', challengeSchema);
 

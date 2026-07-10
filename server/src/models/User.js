@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password only when it has changed
+// Hash password before saving
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 
@@ -73,12 +73,12 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
+// Compare passwords
+userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Hide sensitive fields
+// Remove sensitive fields when returning user data
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
 
@@ -87,6 +87,34 @@ userSchema.methods.toJSON = function () {
   delete obj.__v;
 
   return obj;
+};
+
+// Seed Architect account
+userSchema.statics.seedArchitect = async function () {
+  const architectEmail =
+    process.env.ARCHITECT_EMAIL || 'architect@venture.com';
+  const architectPassword =
+    process.env.ARCHITECT_PASSWORD || 'Architect@2026!';
+
+  let architect = await this.findOne({ email: architectEmail });
+
+  if (!architect) {
+    architect = await this.create({
+      email: architectEmail,
+      password: architectPassword,
+      role: 'admin',
+      accountStatus: 'active',
+    });
+
+    console.log('Architect account seeded successfully');
+  } else if (architect.role !== 'admin') {
+    architect.role = 'admin';
+    await architect.save();
+
+    console.log('Architect role updated for existing user');
+  }
+
+  return architect;
 };
 
 const User = mongoose.model('User', userSchema);

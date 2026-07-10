@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { createNotification } from '../services/notificationService.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -19,6 +20,17 @@ export const register = async (req, res, next) => {
       email,
       password,
       role: 'user',
+    });
+
+    // Notify the Architect
+    await createNotification({
+      type: 'builder_registered',
+      category: 'builder',
+      title: 'New Builder Registered',
+      description: `${user.email} has joined VENTURE`,
+      builder: user._id,
+      builderEmail: user.email,
+      priority: 'normal',
     });
 
     const token = generateToken(user._id);
@@ -52,6 +64,10 @@ export const login = async (req, res, next) => {
 
     if (!user.isActive) {
       throw new AppError('Account has been deactivated', 401);
+    }
+
+    if (user.accountStatus === 'suspended') {
+      throw new AppError(`Account suspended. Contact support.`, 403);
     }
 
     const isPasswordCorrect = await user.comparePassword(password);
@@ -95,8 +111,6 @@ export const getMe = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    // In a more advanced implementation, you might want to blacklist the token
-    // For now, client-side token removal is sufficient
     res.status(200).json({
       success: true,
       message: 'Logged out successfully',

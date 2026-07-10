@@ -5,6 +5,7 @@ import {
   getChallenges,
   getChallenge,
   joinChallenge,
+  updateProgress,
   getMyChallenges,
 } from '../controllers/challengeController.js';
 
@@ -15,5 +16,6 @@ router.get('/', protect, getChallenges);
 router.get('/my', protect, getMyChallenges);
 router.get('/:id', protect, getChallenge);
 router.post('/:id/join', protect, joinChallenge);
+router.put('/:challengeId/progress', protect, updateProgress);
 
 export default router;
