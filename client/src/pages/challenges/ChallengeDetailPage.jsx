@@ -21,10 +21,6 @@ const ChallengeDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
 
-  useEffect(() => {
-    fetchChallenge();
-  }, [id]);
-
   const fetchChallenge = async () => {
     try {
       const response = await challengeService.getChallenge(id);
@@ -36,6 +32,10 @@ const ChallengeDetailPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchChallenge();
+  }, [id]);
 
   const handleJoin = async () => {
     setJoining(true);
@@ -117,7 +117,7 @@ const ChallengeDetailPage = () => {
             <Avatar size="sm" alt={challenge.createdBy?.email} />
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white">Instigator</p>
-              <p className="text-xs text-gray-500">{challenge.createdBy?.email}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{challenge.createdBy?.email}</p>
             </div>
           </div>
 
@@ -156,13 +156,13 @@ const ChallengeDetailPage = () => {
           <p className="text-sm text-gray-600 dark:text-gray-300">{challenge.reward}</p>
           {challenge.penalty && (
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-              <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500" /> Penalty</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500" /> Penalty</p>
               <p className="text-sm text-red-600 dark:text-red-400">{challenge.penalty}</p>
             </div>
           )}
           {challenge.bonus && (
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-              <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Gem className="w-3 h-3 text-purple-500" /> Bonus</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1"><Gem className="w-3 h-3 text-purple-500" /> Bonus</p>
               <p className="text-sm text-purple-600 dark:text-purple-400">{challenge.bonus}</p>
             </div>
           )}
@@ -188,7 +188,7 @@ const ChallengeDetailPage = () => {
                   <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style={{ width: `${p.progress}%` }} />
                   </div>
-                  <span className="text-xs text-gray-500">{p.progress}%</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{p.progress}%</span>
                 </div>
               </div>
             ))}
